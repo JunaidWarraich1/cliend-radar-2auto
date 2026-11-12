@@ -115,3 +115,31 @@ def test_bookmarklet_and_status_endpoint(tmp_path, monkeypatch):
 
     resp_bad = client.post("/api/status/job_1", json={"action": "invalid", "value": True})
     assert resp_bad.status_code == 400
+
+
+def test_render_dashboard_local_and_static_modes():
+    """Verify both local_mode=True (with email send button) and static mode render cleanly."""
+    from app import render_dashboard_html
+
+    sample_jobs = [{
+        "id": "hn_email_1",
+        "title": "Junior QA Tester",
+        "company": "Startup Co",
+        "url": "mailto:jobs@startup.test",
+        "email": "jobs@startup.test",
+        "apply_type": "email",
+        "location": "Remote",
+        "description": "Help test Python APIs.",
+        "source": "Hacker News",
+        "track": "QA & Software Testing",
+        "ease_score": 88,
+        "competition_label": "Lower Competition",
+        "geo_label": "Worldwide",
+        "freshness_label": "1d ago",
+        "days_old": 1,
+        "is_entry_friendly": True,
+    }]
+    html_local = render_dashboard_html(sample_jobs, {}, "2026-11-12 12:30", local_mode=True)
+    assert "1-Click Send PDF Email" in html_local
+    html_static = render_dashboard_html(sample_jobs, {}, "2026-11-12 12:30", local_mode=False)
+    assert "Copy Auto-Fill" in html_static

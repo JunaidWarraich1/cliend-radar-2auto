@@ -118,14 +118,19 @@ def render_dashboard_html(
         )
         cta_text = "Email App" if is_email else ("Apply Direct (No Signup)" if job.get("apply_type") == "ats" else "Open Job Page")
 
+        safe_id = html.escape(jid, quote=True)
         send_btn = ""
         if local_mode and is_email:
             send_btn = (
-                f'<button type="button" class="btn btn-green" onclick="sendDirectEmail(\'{html.escape(jid, quote=True)}\')">'
+                f'<button type="button" class="btn btn-green" onclick="sendDirectEmail(\'{safe_id}\')">'
                 '1-Click Send PDF Email</button>'
             )
 
-        safe_id = html.escape(jid, quote=True)
+        copy_short_btn = (
+            f'<button type="button" class="btn btn-secondary" onclick="copyPitch(\'{safe_id}\', \'short\')">'
+            "Copy Short Pitch</button>"
+        )
+        secondary_cta = send_btn if send_btn else copy_short_btn
         safe_title = html.escape(job["title"])
         safe_company = html.escape(job["company"])
         safe_source = html.escape(job["source"])
@@ -169,7 +174,7 @@ def render_dashboard_html(
 
             <div class="actions-main">
                 <a href="{safe_href}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">{cta_text} &rarr;</a>
-                {send_btn if send_btn else f'<button type="button" class="btn btn-secondary" onclick="copyPitch(\'{safe_id}\', \'short\')">Copy Short Pitch</button>'}
+                {secondary_cta}
             </div>
 
             <div class="actions-sub">
